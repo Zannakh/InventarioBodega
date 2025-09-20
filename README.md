@@ -18,7 +18,7 @@ Permite administrar productos, proveedores, bodegas, categorías y movimientos d
 
 1. **Clonar el repositorio**
    ```bash
-   git clone <url-del-repo>
+   git clone https://github.com/Zannakh/InventarioBodega
    cd Prueba_Inventario
    ```
 
