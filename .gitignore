@@ -1,12 +1,15 @@
 # Entornos virtuales
+.venv/
 venv/
-.env
+env/
 
-# Archivos de compilación de Python
+# Archivos de sistema
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
+*.db
+*.sqlite3
 
 # Base de datos local
 db.sqlite3
@@ -14,6 +17,10 @@ db.sqlite3
 # Archivos de migraciones compiladas
 */migrations/__pycache__/
 
-# Configuración de IDEs
+# Configuración local
+.env
+*.log
+
+# Archivos temporales de VSCode o PyCharm
 .vscode/
 .idea/
