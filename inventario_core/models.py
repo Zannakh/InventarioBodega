@@ -74,36 +74,3 @@ class Movimiento(models.Model):
     def clean(self):
         if self.cantidad == 0:
             raise ValidationError("La cantidad debe ser mayor a cero.")
-
-    @transaction.atomic
-    def save(self, *args, **kwargs):
-        """Aplica reglas de stock:
-           - ENTRADA: suma
-           - SALIDA/MERMA: resta (sin negativos)
-           Soporta edición de un movimiento (revierte el efecto anterior)."""
-        self.clean()
-
-        # Si estamos editando, revertimos el efecto del movimiento previo
-        if self.pk:
-            prev = Movimiento.objects.select_for_update().get(pk=self.pk)
-            prod_prev = Producto.objects.select_for_update().get(pk=prev.producto_id)
-
-            if prev.tipo == self.ENTRADA:
-                prod_prev.stock_actual -= prev.cantidad
-            else:  # SALIDA o MERMA
-                prod_prev.stock_actual += prev.cantidad
-
-            if prod_prev.stock_actual < 0:
-                raise ValidationError("Stock negativo al revertir el movimiento previo.")
-            prod_prev.save()
-
-        # Aplicar el movimiento actual
-        prod = Producto.objects.select_for_update().get(pk=self.producto_id)
-        nuevo = prod.stock_actual + self.cantidad if self.tipo == self.ENTRADA else prod.stock_actual - self.cantidad
-        if nuevo < 0:
-            raise ValidationError("Operación inválida: el stock no puede quedar negativo.")
-
-        prod.stock_actual = nuevo
-        prod.save()
-
-        super().save(*args, **kwargs)

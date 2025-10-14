@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 from decouple import config
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -123,20 +124,43 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     # ...
     'inventario_core',
+    'rest_framework.authtoken',
     'rest_framework',
 ]
 
 REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        # Browsable API con sesión (útil si entrarás por /admin)
+        "rest_framework.authentication.SessionAuthentication",
+        # JWT para Postman / clientes
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ),
+    "DEFAULT_PERMISSION_CLASSES": (
+        "rest_framework.permissions.IsAuthenticated",
+    ),
+    "DEFAULT_RENDERER_CLASSES": (
+        "rest_framework.renderers.JSONRenderer",
+        "rest_framework.renderers.BrowsableAPIRenderer",  # útil para demo
+    ),
+    # Handler simple y seguro (lo creamos más abajo)
     "EXCEPTION_HANDLER": "inventario_core.api_exceptions.custom_exception_handler"
 }
 
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+}
+
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': config('DB_NAME'),
-        'USER': config('DB_USER'),
-        'PASSWORD': config('DB_PASSWORD', default=''),
-        'HOST': config('DB_HOST', default='localhost'),
-        'PORT': config('DB_PORT', default='3306'),
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+#        'ENGINE': 'django.db.backends.mysql',
+#        'NAME': config('DB_NAME'),
+#        'USER': config('DB_USER'),
+#        'PASSWORD': config('DB_PASSWORD', default=''),
+#        'HOST': config('DB_HOST', default='localhost'),
+#        'PORT': config('DB_PORT', default='3306'),
     }
 }
